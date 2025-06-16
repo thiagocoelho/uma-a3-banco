@@ -23,7 +23,7 @@ public class MainFrame extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(6, 1, 10, 10));
+        panel.setLayout(new GridLayout(8, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adiciona padding ao painel principal
 
         JLabel nomeLabel = new JLabel("Nome: " + conta.getNome());
@@ -81,6 +81,44 @@ public class MainFrame extends JFrame {
             }
         });
 
+        JButton depositarButton = new JButton("Depositar");
+        depositarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String valorStr = JOptionPane.showInputDialog("Digite o valor para depósito:");
+                try {
+                    double valor = Double.parseDouble(valorStr);
+                    if (contaService.depositarSaldo(conta.getAgencia(), conta.getNumeroConta(), valor)) {
+                        JOptionPane.showMessageDialog(null, "Depósito realizado com sucesso!");
+                        saldoLabel.setText("Saldo: R$ " + conta.getSaldo());
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Falha ao realizar depósito.");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Valor inválido.");
+                }
+            }
+        });
+
+        JButton sacarButton = new JButton("Sacar");
+        sacarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String valorStr = JOptionPane.showInputDialog("Digite o valor para saque:");
+                try {
+                    double valor = Double.parseDouble(valorStr);
+                    if (contaService.sacarSaldo(conta.getAgencia(), conta.getNumeroConta(), valor)) {
+                        JOptionPane.showMessageDialog(null, "Saque realizado com sucesso!");
+                        saldoLabel.setText("Saldo: R$ " + conta.getSaldo());
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Falha ao realizar saque.");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Valor inválido.");
+                }
+            }
+        });
+
         panel.add(nomeLabel);
         panel.add(agenciaLabel);
         panel.add(numeroContaLabel);
@@ -89,6 +127,8 @@ public class MainFrame extends JFrame {
         panel.add(transferenciaPixButton);
         panel.add(transferenciaAgenciaButton);
         panel.add(listarTransferenciasButton);
+        panel.add(depositarButton);
+        panel.add(sacarButton);
         panel.add(sairButton);
 
         add(panel);

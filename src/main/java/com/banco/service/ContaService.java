@@ -16,7 +16,7 @@ public class ContaService {
 
     public String cadastrarContaPF(String nome, String cpf, String senha) {
         String numeroConta = gerarNumeroConta();
-        String sql = "INSERT INTO contas (tipo, nome, cpf_cnpj, score, agencia, numero_conta, saldo, senha) VALUES ('PF', ?, ?, 60, '0001', ?, 1000.00, ?)";
+        String sql = "INSERT INTO contas (tipo, nome, cpf_cnpj, score, agencia, numero_conta, saldo, senha) VALUES ('PF', ?, ?, 60, '0001', ?, 0.00, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, nome);
@@ -33,7 +33,7 @@ public class ContaService {
 
     public String cadastrarContaPJ(String nome, String cnpj, String senha) {
         String numeroConta = gerarNumeroConta();
-        String sql = "INSERT INTO contas (tipo, nome, cpf_cnpj, score, agencia, numero_conta, saldo, senha) VALUES ('PJ', ?, ?, 60, '0001', ?, 1000.00, ?)";
+        String sql = "INSERT INTO contas (tipo, nome, cpf_cnpj, score, agencia, numero_conta, saldo, senha) VALUES ('PJ', ?, ?, 60, '0001', ?, 0.00, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, nome);
@@ -117,6 +117,49 @@ public class ContaService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean depositarSaldo(String agencia, String numeroConta, double valor) {
+        Conta conta = buscarConta(agencia, numeroConta);
+        if (conta != null && valor > 0) {
+            if (conta instanceof ContaPF) {
+                ((ContaPF) conta).depositar(valor);
+            } else if (conta instanceof ContaPJ) {
+                ((ContaPJ) conta).depositar(valor);
+            }
+            atualizarSaldoNoBanco(conta);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean sacarSaldo(String agencia, String numeroConta, double valor) {
+        Conta conta = buscarConta(agencia, numeroConta);
+        if (conta != null && valor > 0) {
+            boolean sucesso;
+            if (conta instanceof ContaPF) {
+                sucesso = ((ContaPF) conta).sacar(valor);
+            } else {
+                sucesso = ((ContaPJ) conta).sacar(valor);
+            }
+            if (sucesso) {
+                atualizarSaldoNoBanco(conta);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void atualizarSaldoNoBanco(Conta conta) {
+        String sql = "UPDATE contas SET saldo = ? WHERE id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDouble(1, conta.getSaldo());
+            statement.setInt(2, conta.getId());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private String gerarNumeroConta() {
