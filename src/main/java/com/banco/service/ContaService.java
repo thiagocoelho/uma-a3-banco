@@ -25,8 +25,11 @@ public class ContaService {
             statement.setString(4, senha);
             statement.executeUpdate();
             System.out.println("Conta PF cadastrada com sucesso: " + nome);
+        } catch (java.sql.SQLIntegrityConstraintViolationException e) {
+            return "Erro: CPF já cadastrado.";
         } catch (SQLException e) {
             e.printStackTrace();
+            return "Erro ao cadastrar conta.";
         }
         return numeroConta;
     }
@@ -42,8 +45,11 @@ public class ContaService {
             statement.setString(4, senha);
             statement.executeUpdate();
             System.out.println("Conta PJ cadastrada com sucesso: " + nome);
+        } catch (java.sql.SQLIntegrityConstraintViolationException e) {
+            return "Erro: CNPJ já cadastrado.";
         } catch (SQLException e) {
             e.printStackTrace();
+            return "Erro ao cadastrar conta.";
         }
         return numeroConta;
     }

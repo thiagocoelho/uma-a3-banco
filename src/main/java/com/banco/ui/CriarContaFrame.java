@@ -83,9 +83,13 @@ public class CriarContaFrame extends JFrame {
             numeroConta = contaService.cadastrarContaPJ(nome, cpfCnpj, senha);
         }
 
-        JOptionPane.showMessageDialog(this, "Conta criada com sucesso!\nNúmero da Conta: " + numeroConta, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-        LoginFrame loginFrame = new LoginFrame();
-        loginFrame.setVisible(true);
-        dispose();
+        if (numeroConta.startsWith("Erro")) {
+            JOptionPane.showMessageDialog(this, numeroConta, "Erro", JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Conta criada com sucesso!\nNúmero da Conta: " + numeroConta, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            LoginFrame loginFrame = new LoginFrame();
+            loginFrame.setVisible(true);
+            dispose();
+        }
     }
 }
