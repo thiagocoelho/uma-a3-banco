@@ -66,4 +66,23 @@ public class DenunciaService {
         String motivo = "Denúncia automática"; // Motivo padrão para denúncias
         registrarDenuncia(transferenciaId, motivo);
     }
+
+    public boolean isDenunciada(int transferenciaId) {
+        String verificarDenunciaSql = "SELECT COUNT(*) FROM denuncias WHERE transferencia_id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement verificarDenunciaStmt = connection.prepareStatement(verificarDenunciaSql)) {
+
+            verificarDenunciaStmt.setInt(1, transferenciaId);
+            ResultSet resultSet = verificarDenunciaStmt.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }

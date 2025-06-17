@@ -5,8 +5,11 @@ import com.banco.service.DenunciaService;
 import com.banco.service.TransferenciaService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ListarTransferenciasFrame extends JFrame {
 
@@ -49,10 +52,35 @@ public class ListarTransferenciasFrame extends JFrame {
             data[i][4] = t.getDetalhesDestino(); // Detalhes do destino
         }
 
+        // Pré-processar transferências denunciadas para melhorar o desempenho
+        Set<Integer> transferenciasDenunciadas = new HashSet<>();
+        for (Transferencia t : transferencias) {
+            if (denunciaService.isDenunciada(t.getId())) {
+                transferenciasDenunciadas.add(t.getId());
+            }
+        }
+
         JTable table = new JTable(data, columnNames);
         table.getColumnModel().getColumn(0).setMinWidth(0); // Oculta a coluna ID
         table.getColumnModel().getColumn(0).setMaxWidth(0); // Oculta a coluna ID
         table.getColumnModel().getColumn(0).setWidth(0); // Oculta a coluna ID
+
+        // Adiciona um TableCellRenderer para destacar linhas denunciadas
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int transferenciaId = (int) table.getValueAt(row, 0); // Obtém o ID da transferência
+                if (transferenciasDenunciadas.contains(transferenciaId)) { // Verifica se a transferência foi denunciada
+                    cell.setBackground(Color.RED);
+                    cell.setForeground(Color.WHITE);
+                } else {
+                    cell.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                    cell.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+                }
+                return cell;
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(table);
         panel.add(scrollPane, BorderLayout.CENTER);
