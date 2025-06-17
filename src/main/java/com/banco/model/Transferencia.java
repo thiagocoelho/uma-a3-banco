@@ -9,6 +9,8 @@ public class Transferencia {
     private double valor;
     private Date data;
     private String tipo;
+    private String nomeDestinatario;
+    private String detalhesDestino;
 
     public Transferencia(int id, String origem, String destino, double valor, Date data, String tipo) {
         this.id = id;
@@ -16,6 +18,14 @@ public class Transferencia {
         this.destino = destino;
         this.valor = valor;
         this.data = data;
+        this.tipo = tipo;
+    }
+
+    public Transferencia(int id, String nomeDestinatario, String detalhesDestino, double valor, String tipo) {
+        this.id = id;
+        this.nomeDestinatario = nomeDestinatario;
+        this.detalhesDestino = detalhesDestino;
+        this.valor = valor;
         this.tipo = tipo;
     }
 
@@ -41,6 +51,14 @@ public class Transferencia {
 
     public String getTipo() {
         return tipo;
+    }
+
+    public String getNomeDestinatario() {
+        return nomeDestinatario;
+    }
+
+    public String getDetalhesDestino() {
+        return detalhesDestino;
     }
 
     public void setTipo(String tipo) {

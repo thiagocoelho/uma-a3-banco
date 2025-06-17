@@ -37,15 +37,16 @@ public class ListarTransferenciasFrame extends JFrame {
         panel.add(instructionLabel, BorderLayout.NORTH);
 
         List<Transferencia> transferencias = transferenciaService.listarTransferenciasPorCliente(clienteId);
-        String[] columnNames = {"ID", "Destino", "Valor", "Tipo"};
-        Object[][] data = new Object[transferencias.size()][4];
+        String[] columnNames = {"ID", "Destino", "Valor", "Tipo", "Detalhes do Destino"};
+        Object[][] data = new Object[transferencias.size()][5];
 
         for (int i = 0; i < transferencias.size(); i++) {
             Transferencia t = transferencias.get(i);
             data[i][0] = t.getId(); // Adiciona o ID da transferência
-            data[i][1] = t.getDestino();
+            data[i][1] = t.getNomeDestinatario(); // Nome do destinatário
             data[i][2] = t.getValor();
             data[i][3] = t.getTipo();
+            data[i][4] = t.getDetalhesDestino(); // Detalhes do destino
         }
 
         JTable table = new JTable(data, columnNames);

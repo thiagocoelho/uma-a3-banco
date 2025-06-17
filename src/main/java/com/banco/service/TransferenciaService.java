@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class TransferenciaService {
@@ -142,7 +141,12 @@ public class TransferenciaService {
 
     public List<Transferencia> listarTransferenciasPorCliente(int clienteId) {
         List<Transferencia> transferencias = new ArrayList<>();
-        String sql = "SELECT * FROM transferencias WHERE conta_origem_id = ? OR conta_destino_id = ?";
+        String sql = "SELECT t.id, t.valor, t.tipo, c.nome AS nome_destinatario, " +
+                     "CASE WHEN t.tipo = 'PIX' THEN cp.chave ELSE CONCAT(c.agencia, '-', c.numero_conta) END AS detalhes_destino " +
+                     "FROM transferencias t " +
+                     "JOIN contas c ON t.conta_destino_id = c.id " +
+                     "LEFT JOIN chaves_pix cp ON c.id = cp.conta_id AND t.tipo = 'PIX' " +
+                     "WHERE t.conta_origem_id = ? OR t.conta_destino_id = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, clienteId);
@@ -150,12 +154,11 @@ public class TransferenciaService {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int id = resultSet.getInt("id");
-                    String origem = resultSet.getString("conta_origem_id");
-                    String destino = resultSet.getString("conta_destino_id");
+                    String nomeDestinatario = resultSet.getString("nome_destinatario");
+                    String detalhesDestino = resultSet.getString("detalhes_destino");
                     double valor = resultSet.getDouble("valor");
-                    Date data = resultSet.getTimestamp("data_transferencia");
                     String tipo = resultSet.getString("tipo");
-                    transferencias.add(new Transferencia(id, origem, destino, valor, data, tipo));
+                    transferencias.add(new Transferencia(id, nomeDestinatario, detalhesDestino, valor, tipo));
                 }
             }
         } catch (SQLException e) {
