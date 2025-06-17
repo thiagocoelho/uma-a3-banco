@@ -12,6 +12,7 @@ public class MainFrame extends JFrame {
 
     private Conta conta;
     private ContaService contaService;
+    private JLabel saldoLabel; // Mover a declaração da saldoLabel para a classe
 
     public MainFrame(Conta conta) {
         this.conta = conta;
@@ -33,7 +34,7 @@ public class MainFrame extends JFrame {
         agenciaLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); // Adiciona espaçamento ao rótulo
 
         JLabel numeroContaLabel = new JLabel("Número da Conta: " + conta.getNumeroConta());
-        JLabel saldoLabel = new JLabel("Saldo: R$ " + conta.getSaldo());
+        saldoLabel = new JLabel("Saldo: R$ " + conta.getSaldo()); // Inicializa a saldoLabel
 
         JButton cadastrarPixButton = new JButton("Cadastrar Chave PIX");
         cadastrarPixButton.addActionListener(new ActionListener() {
@@ -48,7 +49,7 @@ public class MainFrame extends JFrame {
         transferenciaPixButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                TransferenciaPixFrame transferenciaPixFrame = new TransferenciaPixFrame(conta.getId());
+                TransferenciaPixFrame transferenciaPixFrame = new TransferenciaPixFrame(MainFrame.this, conta.getId());
                 transferenciaPixFrame.setVisible(true);
             }
         });
@@ -57,7 +58,7 @@ public class MainFrame extends JFrame {
         transferenciaAgenciaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                TransferenciaAgenciaFrame transferenciaAgenciaFrame = new TransferenciaAgenciaFrame(conta.getId());
+                TransferenciaAgenciaFrame transferenciaAgenciaFrame = new TransferenciaAgenciaFrame(MainFrame.this, conta.getId());
                 transferenciaAgenciaFrame.setVisible(true);
             }
         });
@@ -90,7 +91,7 @@ public class MainFrame extends JFrame {
                     double valor = Double.parseDouble(valorStr);
                     if (contaService.depositarSaldo(conta.getAgencia(), conta.getNumeroConta(), valor)) {
                         JOptionPane.showMessageDialog(null, "Depósito realizado com sucesso!");
-                        saldoLabel.setText("Saldo: R$ " + conta.getSaldo());
+                        atualizarSaldo(); // Atualiza o saldo após o depósito
                     } else {
                         JOptionPane.showMessageDialog(null, "Falha ao realizar depósito.");
                     }
@@ -109,7 +110,7 @@ public class MainFrame extends JFrame {
                     double valor = Double.parseDouble(valorStr);
                     if (contaService.sacarSaldo(conta.getAgencia(), conta.getNumeroConta(), valor)) {
                         JOptionPane.showMessageDialog(null, "Saque realizado com sucesso!");
-                        saldoLabel.setText("Saldo: R$ " + conta.getSaldo());
+                        atualizarSaldo(); // Atualiza o saldo após o saque
                     } else {
                         JOptionPane.showMessageDialog(null, "Falha ao realizar saque.");
                     }
@@ -132,5 +133,10 @@ public class MainFrame extends JFrame {
         panel.add(sairButton);
 
         add(panel);
+    }
+
+    public void atualizarSaldo() {
+        conta = contaService.buscarConta(conta.getAgencia(), conta.getNumeroConta());
+        saldoLabel.setText("Saldo: R$ " + conta.getSaldo());
     }
 }

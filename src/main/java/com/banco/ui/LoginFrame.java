@@ -29,7 +29,8 @@ public class LoginFrame extends JFrame {
 
         JLabel agenciaLabel = new JLabel("Agência:");
         agenciaLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); // Adiciona espaçamento ao rótulo
-        agenciaField = new JTextField();
+        agenciaField = new JTextField("0001");
+        agenciaField.setEditable(false);
 
         JLabel numeroContaLabel = new JLabel("Número da Conta:");
         numeroContaLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); // Adiciona espaçamento ao rótulo

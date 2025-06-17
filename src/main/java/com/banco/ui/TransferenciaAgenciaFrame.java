@@ -5,7 +5,7 @@ import com.banco.service.TransferenciaService;
 import javax.swing.*;
 import java.awt.*;
 
-public class TransferenciaAgenciaFrame extends JFrame {
+public class TransferenciaAgenciaFrame extends JDialog {
 
     private JTextField agenciaField;
     private JTextField numeroContaField;
@@ -13,14 +13,14 @@ public class TransferenciaAgenciaFrame extends JFrame {
     private TransferenciaService transferenciaService;
     private int contaOrigemId;
 
-    public TransferenciaAgenciaFrame(int contaOrigemId) {
+    public TransferenciaAgenciaFrame(Frame parent, int contaOrigemId) {
+        super(parent, "Transferência via Agência/Conta", true);
         this.contaOrigemId = contaOrigemId;
         transferenciaService = new TransferenciaService();
 
-        setTitle("Transferência via Agência/Conta");
         setSize(400, 300);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(parent);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4, 2, 10, 10));
@@ -86,6 +86,15 @@ public class TransferenciaAgenciaFrame extends JFrame {
                 }
             }
             JOptionPane.showMessageDialog(this, "Transferência realizada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            
+            // Atualiza o saldo na tela principal
+            SwingUtilities.invokeLater(() -> {
+                Window window = SwingUtilities.getWindowAncestor(TransferenciaAgenciaFrame.this);
+                if (window instanceof MainFrame mainFrame) {
+                    mainFrame.atualizarSaldo();
+                }
+            });
+            
             dispose();
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Valor inválido!", "Erro", JOptionPane.ERROR_MESSAGE);

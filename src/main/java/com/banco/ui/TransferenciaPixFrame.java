@@ -5,21 +5,21 @@ import com.banco.service.TransferenciaService;
 import javax.swing.*;
 import java.awt.*;
 
-public class TransferenciaPixFrame extends JFrame {
+public class TransferenciaPixFrame extends JDialog {
 
     private JTextField chavePixField;
     private JTextField valorField;
     private TransferenciaService transferenciaService;
     private int contaOrigemId;
 
-    public TransferenciaPixFrame(int contaOrigemId) {
+    public TransferenciaPixFrame(Frame parent, int contaOrigemId) {
+        super(parent, "Transferência via PIX", true);
         this.contaOrigemId = contaOrigemId;
         transferenciaService = new TransferenciaService();
 
-        setTitle("Transferência via PIX");
         setSize(400, 300);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(parent);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(3, 2, 10, 10));
@@ -79,6 +79,12 @@ public class TransferenciaPixFrame extends JFrame {
                 }
             }
             JOptionPane.showMessageDialog(this, "Transferência realizada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            SwingUtilities.invokeLater(() -> {
+                Window window = SwingUtilities.getWindowAncestor(TransferenciaPixFrame.this);
+                if (window instanceof MainFrame mainFrame) {
+                    mainFrame.atualizarSaldo();
+                }
+            });
             dispose();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Valor inválido!", "Erro", JOptionPane.ERROR_MESSAGE);
