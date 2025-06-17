@@ -21,7 +21,7 @@ public class ListarTransferenciasFrame extends JFrame {
         denunciaService = new DenunciaService();
 
         setTitle("Transferências Realizadas");
-        setSize(600, 400);
+        setSize(700, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -34,9 +34,11 @@ public class ListarTransferenciasFrame extends JFrame {
         panel.add(titleLabel, BorderLayout.NORTH);
 
         // Adicionar uma mensagem acima da tabela
+        // Destacar a mensagem sobre denúncias
         JLabel instructionLabel = new JLabel("Para efetuar uma denúncia, selecione uma transferência e clique no botão DENUNCIAR abaixo.", SwingConstants.CENTER);
-        instructionLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        instructionLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Adiciona espaçamento ao rótulo de instruções
+        instructionLabel.setFont(new Font("Arial", Font.BOLD, 14)); // Aumenta o tamanho e deixa em negrito
+        instructionLabel.setForeground(Color.BLUE); // Define a cor do texto como azul
+        instructionLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0)); // Adiciona espaçamento ao redor da mensagem
         panel.add(instructionLabel, BorderLayout.NORTH);
 
         List<Transferencia> transferencias = transferenciaService.listarTransferenciasPorCliente(clienteId);
@@ -82,10 +84,15 @@ public class ListarTransferenciasFrame extends JFrame {
             }
         });
 
+        // Adicionar espaçamento entre a tabela e o botão
+        JPanel tablePanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(table);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0)); // Espaçamento abaixo da tabela
+        panel.add(tablePanel, BorderLayout.CENTER);
 
-        // Adicionar botão 'Denunciar' abaixo da tabela
+        // Centralizar o botão 'Denunciar' abaixo da tabela
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton denunciarButton = new JButton("Denunciar");
         denunciarButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -93,13 +100,21 @@ public class ListarTransferenciasFrame extends JFrame {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1) {
                     int transferenciaId = (int) table.getValueAt(selectedRow, 0); // Usa o ID da transferência
+
+                    // Verificar se a transferência já foi denunciada
+                    if (denunciaService.isDenunciada(transferenciaId)) {
+                        JOptionPane.showMessageDialog(ListarTransferenciasFrame.this, "Denúncia já efetuada para esta transação!", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return; // Interrompe o fluxo para evitar nova denúncia
+                    }
+
                     denunciarTransferencia(transferenciaId);
                 } else {
                     JOptionPane.showMessageDialog(ListarTransferenciasFrame.this, "Por favor, selecione uma transferência para denunciar.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
-        panel.add(denunciarButton, BorderLayout.SOUTH);
+        buttonPanel.add(denunciarButton);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(panel);
     }
