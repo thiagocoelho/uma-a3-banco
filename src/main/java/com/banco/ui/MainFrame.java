@@ -36,6 +36,12 @@ public class MainFrame extends JFrame {
         JLabel numeroContaLabel = new JLabel("Número da Conta: " + conta.getNumeroConta());
         saldoLabel = new JLabel("Saldo: R$ " + conta.getSaldo()); // Inicializa a saldoLabel
 
+        // Estilizando os rótulos para destaque
+        nomeLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        agenciaLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        numeroContaLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        saldoLabel.setFont(new Font("Arial", Font.BOLD, 16));
+
         JButton cadastrarPixButton = new JButton("Cadastrar Chave PIX");
         cadastrarPixButton.addActionListener(new ActionListener() {
             @Override
